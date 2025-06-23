@@ -1,4 +1,6 @@
-type KeyToDepMap = Map<any, ReactiveEffect>
+import {Dep, createDep} from './dep'
+
+type KeyToDepMap = Map<any, Dep>
 
 /**
  * 收集所有依赖的 WeakMap 实例
@@ -32,9 +34,18 @@ export function track(
         depsMap = new Map()
         targetMap.set(target, depsMap)
     }
-    // 为map 设置回调（effect 实例）
-    depsMap.set(key, activeEffect)
+
+    let dep = depsMap.get(key)
+    if (!dep) {
+        dep = createDep()
+        depsMap.set(key, dep)
+    }
     console.log('@=>track:targetMap', targetMap)
+    trackEffects(dep)
+}
+
+export function trackEffects(dep: Dep) {
+    dep.add(activeEffect!)
 }
 
 /**
@@ -49,13 +60,22 @@ export function trigger(
     newValue?: unknown
 ) {
     console.log('@=>trigger:触发依赖', target, key, newValue)
-
     const depsMap = targetMap.get(target)
     if (!depsMap) return
-    const effect = depsMap.get(key) as ReactiveEffect
-    if(!effect) return
-    // 执行 effect 中的 fn
-    effect.fn()
+    const dep = depsMap.get(key)
+    if (!dep) return;
+    triggerEffects(dep)
+}
+// 依次触发依赖
+export function triggerEffects(dep: Dep) {
+    const effects = Array.isArray(dep) ? dep : [...dep]
+    for (const effect of effects) {
+        triggerEffect(effect)
+    }
+}
+// 触发指定依赖
+export function triggerEffect(effect: ReactiveEffect) {
+    effect.run()
 }
 
 /**
@@ -70,7 +90,7 @@ export function effect<T = any>(fn: () => T) {
 }
 
 
-class ReactiveEffect<T = any> {
+export class ReactiveEffect<T = any> {
     constructor(
         public fn: () => T,
     ) {

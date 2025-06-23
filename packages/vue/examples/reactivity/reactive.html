@@ -7,6 +7,7 @@
 </head>
 <body>
 <div id="app"></div>
+<div id="test"></div>
 </body>
 
 <script>
@@ -21,6 +22,9 @@
     // // obj.name = '张三'
     effect(() => {
         document.getElementById('app').innerHTML = obj.name + obj.age
+    })
+    effect(() => {
+        document.getElementById('test').innerHTML = obj.name + obj.age
     })
 
     setTimeout(() => {
