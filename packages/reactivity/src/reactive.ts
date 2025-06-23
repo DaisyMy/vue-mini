@@ -1,2 +1,41 @@
 import {mutableHandlers} from "./baseHandlers";
 
+/**
+ * 响应式 Map 缓存对象
+ * key: target
+ * val: proxy
+ */
+export const reactiveMap = new WeakMap<object, any>();
+
+/**
+ * 创建响应式对象
+ * @param target
+ * @returns 代理对象
+ */
+export function reactive(target: object) {
+    return createReactiveObject(target, mutableHandlers, reactiveMap)
+}
+
+/**
+ * 创建响应式对象
+ * @param target 响应式对象
+ * @param baseHandlers handler
+ * @param proxyMap
+ * @returns
+ */
+export function createReactiveObject(
+    target: object,
+    baseHandlers: ProxyHandler<any>,
+    proxyMap: WeakMap<object, any>
+) {
+    // 是否被代理
+    const existingProxy = proxyMap.get(target);
+    if (existingProxy) {
+        return existingProxy;
+    }
+    // 创建proxy实例
+    const proxy = new Proxy(target, baseHandlers);
+
+    proxyMap.set(target, proxy);
+    return proxy;
+}
