@@ -13,18 +13,20 @@
     const {reactive, effect} = Vue
 
     const obj = reactive({
-        name: '李四'
+        name: '李四',
+        age: 18
     })
 
-    // console.log(obj.name)
-    // obj.name = '张三'
+    // // console.log(obj.name)
+    // // obj.name = '张三'
     effect(() => {
-        document.getElementById('app').innerHTML = obj.name
+        document.getElementById('app').innerHTML = obj.name + obj.age
     })
 
     setTimeout(() => {
         console.log(obj.name)
         obj.name = '张三'
+        obj.age = 20
     }, 2000)
 
 </script>
