@@ -1,6 +1,7 @@
 import {createDep, Dep} from './dep'
-import {activeEffect, trackEffects} from "./effect";
+import {activeEffect, trackEffects, triggerEffects} from "./effect";
 import {toReactive} from './reactive'
+import {hasChanged} from '@vue/shared'
 
 
 export interface Ref<T = any> {
@@ -28,7 +29,8 @@ export function createRef(rawValue: unknown, shallow: boolean) {
 }
 
 class RefImpl<T> {
-    private readonly _value: T | boolean
+    private _value: T
+    private _rawValue: T
     public dep?: Dep = undefined
 
     // 是否为 ref 类型标记
@@ -36,6 +38,7 @@ class RefImpl<T> {
 
     constructor(value: T, public readonly __v_isShallow: boolean) {
         this._value = __v_isShallow ? value : toReactive(value)
+        this._rawValue = value
     }
 
     /**
@@ -47,6 +50,17 @@ class RefImpl<T> {
     }
 
     set value(newVal) {
+        if (hasChanged(newVal, this._rawValue)) {
+            this._rawValue = newVal
+            this._value = toReactive(newVal)
+            triggerRefValue(this)
+        }
+    }
+}
+
+export function triggerRefValue(ref) {
+    if (ref.dep) {
+        triggerEffects(ref.dep)
     }
 }
 

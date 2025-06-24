@@ -44,6 +44,10 @@ export function track(
     trackEffects(dep)
 }
 
+/**
+ * dep 添加 activeEffect
+ * @param dep
+ */
 export function trackEffects(dep: Dep) {
     dep.add(activeEffect!)
 }
