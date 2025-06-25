@@ -58,6 +58,10 @@ class RefImpl<T> {
     }
 }
 
+/**
+ * 执行 ref 的依赖
+ * @param ref
+ */
 export function triggerRefValue(ref) {
     if (ref.dep) {
         triggerEffects(ref.dep)

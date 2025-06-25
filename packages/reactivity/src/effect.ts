@@ -1,7 +1,8 @@
 import {Dep, createDep} from './dep'
+import {ComputedRefImpl} from "./computed";
 
 type KeyToDepMap = Map<any, Dep>
-
+export type EffectScheduler = (...arg: any[]) => any
 /**
  * 收集所有依赖的 WeakMap 实例
  * {key, value: {
@@ -70,16 +71,31 @@ export function trigger(
     if (!dep) return;
     triggerEffects(dep)
 }
+
 // 依次触发依赖
 export function triggerEffects(dep: Dep) {
     const effects = Array.isArray(dep) ? dep : [...dep]
+    // 解决死循环问题
     for (const effect of effects) {
-        triggerEffect(effect)
+        if(effect.computed){
+            triggerEffect(effect)
+        }
+    }
+    for (const effect of effects) {
+        if(!effect.computed){
+            triggerEffect(effect)
+        }
     }
 }
+
 // 触发指定依赖
 export function triggerEffect(effect: ReactiveEffect) {
-    effect.run()
+    if (effect.scheduler) {
+        // 处理 computed
+        effect.scheduler()
+    } else {
+        effect.run()
+    }
 }
 
 /**
@@ -95,8 +111,17 @@ export function effect<T = any>(fn: () => T) {
 
 
 export class ReactiveEffect<T = any> {
+
+    computed?: ComputedRefImpl<T>
+
+    /**
+     * 创建类的实例。
+     * @param  fn - 要执行的函数，该函数返回类型为 T 的值。
+     * @param  scheduler - 负责管理 effect 执行的调度器。如果未提供，则默认为 null。
+     */
     constructor(
         public fn: () => T,
+        public scheduler: EffectScheduler | null = null
     ) {
     }
 
