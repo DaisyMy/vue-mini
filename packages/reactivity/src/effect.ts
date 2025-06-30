@@ -1,5 +1,6 @@
 import {Dep, createDep} from './dep'
 import {ComputedRefImpl} from "./computed";
+import {extend} from "@vue/shared"
 
 type KeyToDepMap = Map<any, Dep>
 export type EffectScheduler = (...arg: any[]) => any
@@ -77,12 +78,12 @@ export function triggerEffects(dep: Dep) {
     const effects = Array.isArray(dep) ? dep : [...dep]
     // 解决死循环问题
     for (const effect of effects) {
-        if(effect.computed){
+        if (effect.computed) {
             triggerEffect(effect)
         }
     }
     for (const effect of effects) {
-        if(!effect.computed){
+        if (!effect.computed) {
             triggerEffect(effect)
         }
     }
@@ -102,11 +103,16 @@ export function triggerEffect(effect: ReactiveEffect) {
  * effect 函数
  * @param fn
  */
-export function effect<T = any>(fn: () => T) {
+export function effect<T = any>(fn: () => T, options) {
     // 创建 ReactiveEffect (activeEffect) 实例
     const _effect = new ReactiveEffect(fn)
-    // 执行 run => fn()
-    _effect.run()
+    if (options) {
+        extend(_effect, options)
+    }
+    if (!options && !options?.lazy) {
+        // 执行 run => fn()
+        _effect.run()
+    }
 }
 
 
@@ -129,4 +135,6 @@ export class ReactiveEffect<T = any> {
         activeEffect = this
         return this.fn()
     }
+
+    stop(){}
 }

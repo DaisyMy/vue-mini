@@ -16,7 +16,7 @@ export class ComputedRefImpl<T> {
     // 标识符
     public _dirty = true
 
-    constructor(getter: () => T) {
+    constructor(public getter: () => T, private readonly setter: Function) {
         // 依赖  getter 依赖函数   ()=>{} 调度器
         this.effect = new ReactiveEffect(getter, () => {
             // 调度器实现响应式
@@ -36,6 +36,10 @@ export class ComputedRefImpl<T> {
         }
         return this._value
     }
+
+    set value(newValue) {
+        this.setter(newValue)
+    }
 }
 
 /**
@@ -44,11 +48,18 @@ export class ComputedRefImpl<T> {
  */
 export function computed(getterOrOptions) {
     let getter
+    let setter
     const onlyGetter = isFunction(getterOrOptions)
     if (onlyGetter) {
         getter = getterOrOptions
+        setter = () => {
+            console.warn("read only")
+        }
+    } else {
+        getter = getterOrOptions.get
+        setter = getterOrOptions.set
     }
 
-    const cRef = new ComputedRefImpl(getter)
+    const cRef = new ComputedRefImpl(getter, setter)
     return cRef as any
 }
