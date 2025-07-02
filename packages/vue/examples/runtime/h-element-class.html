@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>h-element-class</title>
+    <script src="../../dist/vue.js"></script>
+</head>
+<body>
+
+</body>
+<script>
+    const {h} = Vue
+
+    const vnode = h('div', {
+        class: {
+            'red': true
+        }
+    }, [
+        h('p', 'p1'),
+        h('p', 'p2'),
+        h('p', 'p3'),
+    ])
+
+    console.log(vnode)
+</script>
+</html>

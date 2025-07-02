@@ -7,6 +7,9 @@ const resolvePromise = Promise.resolve() as Promise<any>
 
 let currentFlushPromise: Promise<void> | null = null
 
+/**
+ * 存储待执行的回调函数的数组
+ */
 const pendingPreFlushCbs: Function[] = []
 
 export function queuePreFlushCb(cb: Function) {
