@@ -14,3 +14,5 @@ export const EMPTY_OBJECT: { readonly [key: string]: any } = {}
 
 
 export {ShapeFlags} from './shapeFlags'
+
+export {normalizeClass} from './normalizeProp'

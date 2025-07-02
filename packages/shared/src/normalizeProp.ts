@@ -1,4 +1,4 @@
-import {isArray, isObject, isString} from '@vue/shared'
+import {isArray, isObject, isString} from './index'
 
 /**
  * 处理class

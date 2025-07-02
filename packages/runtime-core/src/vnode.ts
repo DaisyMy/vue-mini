@@ -1,5 +1,4 @@
-import {ShapeFlags, isString, isArray, isFunction, isObject} from '@vue/shared'
-import {normalizeClass} from './normalizeProp'
+import {normalizeClass, ShapeFlags, isString, isArray, isFunction, isObject} from '@vue/shared'
 
 export interface VNode {
     __v_isVNode: true
