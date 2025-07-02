@@ -48,7 +48,7 @@ function createBaseVNode(type: any, props: any, children: any, shapeFlag: number
 
 export function normalizeChildren(vnode: VNode, children: unknown) {
     let type = 0
-    const {shapeFlag} = vnode
+    // const {shapeFlag} = vnode
     if (children == null) {
         children = null
     } else if (isArray(children)) {
@@ -61,10 +61,11 @@ export function normalizeChildren(vnode: VNode, children: unknown) {
     } else {
         // children 为 string
         children = String(children)
-        vnode.children = children
-        // 按位或赋值
-        vnode.shapeFlag |= type
+        type = ShapeFlags.TEXT_CHILDREN
     }
+    vnode.children = children
+    // 按位或赋值
+    vnode.shapeFlag |= type
 }
 
 export const Fragment = Symbol('Fragment')
